@@ -90,8 +90,6 @@ export default function MyBookingsPage(token) {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [cancelOpen, setCancelOpen] = useState(false);
 
-  console.log("User token in MyBookingsPage:", token);
-
   // Sample data structure based on your endpoint
   const sampleBookings = [
     {
@@ -176,7 +174,7 @@ export default function MyBookingsPage(token) {
       }
       
       const data = await response.json();
-      console.log("Bookings data:", data);
+      //console.log("Bookings data:", data);
       
       // Use sample data if API returns empty or for testing
       const bookingsData = data.length > 0 ? data : sampleBookings;

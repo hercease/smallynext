@@ -31,7 +31,7 @@ export default function Footer() {
   const subTest = useColorModeValue('gray.400', 'gray.400')
 
   return (
-    <Box as="footer" bg="gray.900" color={textMuted} pt={10} mt={10}>
+    <Box as="footer" bg="gray.900" color={textMuted} pt={10}>
       <Container maxW="container.xl">
         {/* Top Section */}
         <Grid templateColumns={{ base: '1fr', lg: '3fr 8fr' }} gap={8}>
