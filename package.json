@@ -14,14 +14,18 @@
     "@emotion/react": "^11.14.0",
     "@next/bundle-analyzer": "^15.5.3",
     "@react-icons/all-files": "^4.1.0",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.6.0",
     "flatpickr": "^4.6.13",
     "litepicker": "^2.0.12",
     "next": "15.5.3",
     "next-themes": "^0.4.6",
+    "nookies": "^2.5.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
     "react-icons": "^5.5.0",
+    "stripe": "^20.1.0",
     "use-debounce": "^10.0.6"
   },
   "devDependencies": {

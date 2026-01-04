@@ -1,0 +1,37 @@
+const groupCodeData = [
+    { "groupcode": 10, "name": "Location" },
+    { "groupcode": 100, "name": "Points of interest" },
+    { "groupcode": 20, "name": "Hotel type" },
+    { "groupcode": 30, "name": "Methods of payment" },
+    { "groupcode": 40, "name": "Distances (in meters)" },
+    { "groupcode": 60, "name": "Room facilities (Standard room)" },
+    { "groupcode": 61, "name": "Room Distribution" },
+    { "groupcode": 62, "name": "Room distribution Alternative" },
+    { "groupcode": 70, "name": "Amenities and services" },
+    { "groupcode": 71, "name": "Catering" },
+    { "groupcode": 72, "name": "Business" },
+    { "groupcode": 73, "name": "Entertainment" },
+    { "groupcode": 74, "name": "Health" },
+    { "groupcode": 75, "name": "Green Programmes - Worldwide" },
+    { "groupcode": 76, "name": "Green Programmes - Europe" },
+    { "groupcode": 77, "name": "Green Programmes - Americas" },
+    { "groupcode": 78, "name": "Green Programmes - Asia-Pacific" },
+    { "groupcode": 79, "name": "Green Programmes - Africa" },
+    { "groupcode": 80, "name": "Meals" },
+    { "groupcode": 85, "name": "Things to keep in mind" },
+    { "groupcode": 90, "name": "Sports" },
+    { "groupcode": 91, "name": "Healthy & Safety (COVID)" }
+];
+
+// Create a Map for O(1) lookup
+const groupCodeMap = new Map(
+    groupCodeData.map(item => [item.groupcode, item.name])
+);
+
+export function getGroupName(groupcode) {
+    return groupCodeMap.get(groupcode);
+}
+
+// Usage:
+// const name = getGroupName(60); // Returns "Room facilities (Standard room)"
+// const name = getGroupName(999); // Returns undefined

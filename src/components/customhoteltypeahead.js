@@ -285,11 +285,7 @@ const HotelSearchInput = React.memo(function HotelSearchInput({
         </Box>
       )}
 
-      {error && (
-        <Text color="red.500" fontSize="sm" mt={1}>
-          {error}
-        </Text>
-      )}
+      
     </Box>
   );
 });

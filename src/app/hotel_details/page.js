@@ -1,5 +1,5 @@
-import HotelListings from './hotellistingcomponent';
-
+import HotelDetails from './hoteldetailscomponent';
+import { cookies } from 'next/headers'
 export const metadata = {
     title: "Hotel Deals & Accommodations Worldwide | Smallyfares Hotels",
     description: "Discover the best hotel deals with Smallyfares. Book luxury resorts, budget stays, and unique accommodations worldwide with exclusive discounts and seamless booking.",
@@ -121,14 +121,16 @@ export const jsonLd = {
     }
 };
 
-export default async function HotelListing() {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <HotelListings />
-    </>
-  )
+export default async function HotelDetail() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('smallytoken')?.value ?? null;
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <HotelDetails user={token}  />
+        </>
+    )
 }

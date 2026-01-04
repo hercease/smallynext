@@ -1,5 +1,6 @@
 import * as FaIcons from "react-icons/fa";
 import amenities from "./json/hotel_amenities.json";
+import { FiCheck } from "react-icons/fi";
 
 /**
  * Returns React Icon component for a given label
@@ -13,5 +14,5 @@ export function getAmenityIcon(label) {
     if (!item) return null;
 
     const Icon = FaIcons[item.icon];
-    return Icon || null;
+    return Icon || FiCheck;
 }
