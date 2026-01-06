@@ -280,7 +280,7 @@ const CartPage = (user) => {
     }
   }, [user.user, initializeCountdowns, getSessionId]);
 
-  const removeFromCart = async (itemId) => {
+  const removeFromCart = useCallback(async (itemId) => {
     const formData = new FormData();
     formData.append('cart_id', itemId);
     try {
@@ -318,7 +318,7 @@ const CartPage = (user) => {
     catch (error) {
       console.error('Error removing cart item:', error);
     }
-  };
+  }, [fetchCartItems]);
 
   const getCartTotal = () => {
     return cart.items.reduce((total, item) => {
