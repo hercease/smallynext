@@ -1,6 +1,6 @@
 // pages/hotelsdetails
 'use client'
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, Suspense } from 'react';
 import {
   Box,
   Container,
@@ -992,8 +992,8 @@ const ImageGallery = () => {
   ))}*/
 
   return (
+    <Suspense fallback={<LoadingSpinner show={true} text="Loading hotel details..." />}>  
     <Box minH="100vh" bg="gray.50">
-   
     <Header />
     <Container maxW="container.xl" py={8}>
       <LoadingSpinner show={isLoading} text="Processing your request..." />
@@ -1186,6 +1186,7 @@ const ImageGallery = () => {
     />
     <Footer />
   </Box>
+  </Suspense>
   );
 };
 

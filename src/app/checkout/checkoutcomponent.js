@@ -1,6 +1,6 @@
 // pages/checkout.js
 'use client'
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import {
   Box,
   Container,
@@ -66,6 +66,7 @@ import { toaster } from "@/components/ui/toaster"
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { stripePromise } from '@/components/stripe';
 import { useAuth } from '@/components/Auth.js';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 
 // Stripe Card Component
@@ -1298,7 +1299,7 @@ const CheckoutPage = (user) => {
   };
 
   return (
-
+    <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
       <Box minH="100vh" bg="gray.50" pb={{ base: '140px', lg: '0' }}>
         <Header />
         <Container maxW="container.xl" py={8} px={{ base: 4, md: 6 }}>
@@ -1788,7 +1789,7 @@ const CheckoutPage = (user) => {
         <PriceSummaryDrawer />
         <PaymentDrawer />
       </Box>
-    
+    </Suspense>
   );
 };
 

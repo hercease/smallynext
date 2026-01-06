@@ -1,6 +1,6 @@
 // pages/index.js
 'use client'
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import {
   Box,
   Container,
@@ -839,6 +839,7 @@ export default function HotelListingPage() {
     );
 
   return (
+    <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
     <Box minH="100vh" bg="gray.50">
       <Header />
       <Container maxW="container.xl" py="6">
@@ -989,5 +990,6 @@ export default function HotelListingPage() {
 
       <Footer />
     </Box>
+    </Suspense>
   );
 }

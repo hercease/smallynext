@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Box,
@@ -57,6 +57,7 @@ import {
 } from 'react-icons/fi';
 import { FaChild, FaBed, FaWifi, FaSwimmingPool } from 'react-icons/fa';
 import Header from "@/components/header";
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function BookingConfirmation() {
   const searchParams = useSearchParams();
@@ -238,6 +239,7 @@ export default function BookingConfirmation() {
 
 
   return (
+    <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
     <Box minH="100vh" bg="gray.50" pb={{ base: '140px', lg: '0' }}>
     <Header />
       <Container maxW="container.xl" py={8} px={{ base: 4, md: 6 }}>
@@ -633,5 +635,6 @@ export default function BookingConfirmation() {
         }
       `}</style>
     </Box>
+    </Suspense>
   );
 }
