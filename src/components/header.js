@@ -1,3 +1,4 @@
+// components/Header.jsx
 'use client'
 
 import {
@@ -10,15 +11,12 @@ import {
   Drawer,
   VStack,
   Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   HStack,
   Avatar,
-  Container,
   Button,
   Portal,
-  Spinner
+  Spinner,
+  Skeleton
 } from '@chakra-ui/react'
 import {
   FiMenu,
@@ -33,19 +31,19 @@ import {
   FiLogOut
 } from "react-icons/fi";
 import Link from 'next/link';
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/Auth.js';
 
-export default function Header() {
-  
+// Create a separate component for search params logic
+function HeaderContent() {
   const [isOpen, setIsOpen] = useState(false)
   const hoverBgColor = 'gray.100'
   const drawerBg = 'white'
   const drawerColor = 'gray.800'
   const dividerColor = 'gray.200'
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // Now safely wrapped in Suspense
   const router = useRouter();
   const { isLoggedIn, loading, logout, userData } = useAuth();
 
@@ -318,5 +316,40 @@ export default function Header() {
         </Drawer.Root>
       </Box>
     </Box>
+  )
+}
+
+// Main Header component with Suspense
+export default function Header() {
+  return (
+    <Suspense fallback={
+      <Box
+        as="header"
+        position="sticky"
+        top="0"
+        zIndex="sticky"
+        bg='white'
+        boxShadow="sm"
+        borderBottom="1px"
+        color='gray.800'
+        borderColor='gray.700'
+      >
+        <Box maxWidth="8xl" mx="auto" px={{ base: '4', md: '8', lg: '12' }}>
+          <Flex as="nav" h="60px" align="center" justify="space-between">
+            <Skeleton height="40px" width="120px" />
+            <Box display={{ base: "none", lg: "block" }}>
+              <HStack spacing={4}>
+                <Skeleton height="20px" width="60px" />
+                <Skeleton height="20px" width="80px" />
+                <Skeleton height="20px" width="70px" />
+              </HStack>
+            </Box>
+            <Skeleton height="32px" width="80px" />
+          </Flex>
+        </Box>
+      </Box>
+    }>
+      <HeaderContent />
+    </Suspense>
   )
 }

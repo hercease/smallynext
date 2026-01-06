@@ -118,6 +118,16 @@ const CartPage = (user) => {
     }
   };
 
+  // Remove expired item from cart
+  const removeExpiredItem = useCallback(async (itemId) => {
+    try {
+      await removeFromCart(itemId);
+      console.log(`Item ${itemId} removed due to expiration`);
+    } catch (error) {
+      console.error('Error removing expired item:', error);
+    }
+  }, [removeFromCart]);
+
    const startCountdownTimer = useCallback((itemId, addedAt, expiresAt) => {
     // Clear existing timer if any
     if (timersRef.current[itemId]) {
@@ -143,7 +153,7 @@ const CartPage = (user) => {
 
     timersRef.current[itemId] = timer;
     return timer;
-  }, []);
+  }, [removeExpiredItem]);
 
   // Format duration for display (e.g., "15 min" or "2 hours")
   const formatDuration = (milliseconds) => {
@@ -183,15 +193,7 @@ const CartPage = (user) => {
   }, [startCountdownTimer]);
 
 
-  // Remove expired item from cart
-  const removeExpiredItem = async (itemId) => {
-    try {
-      await removeFromCart(itemId);
-      console.log(`Item ${itemId} removed due to expiration`);
-    } catch (error) {
-      console.error('Error removing expired item:', error);
-    }
-  };
+  
 
   // Clean up timers on unmount
   useEffect(() => {
