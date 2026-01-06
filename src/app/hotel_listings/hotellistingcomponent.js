@@ -839,6 +839,7 @@ export default function HotelListingPage() {
     );
 
   return (
+    
     <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
     <Box minH="100vh" bg="gray.50">
       <Header />
