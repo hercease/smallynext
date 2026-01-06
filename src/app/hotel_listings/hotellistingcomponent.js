@@ -840,9 +840,9 @@ export default function HotelListingPage() {
 
   return (
     <Box minH="100vh" bg="gray.50">
-      <LoadingSpinner show={isLoading} text="Processing your request..." />
       <Header />
       <Container maxW="container.xl" py="6">
+        <LoadingSpinner show={isLoading} text="Processing your request..." />
         {/* Search and Sort Bar */}
         {!isMobile && (
           <Box borderWidth="1px" borderColor="gray.200" p="4" shadow="md" borderRadius="md" mb="5">

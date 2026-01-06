@@ -1,6 +1,6 @@
 // pages/checkout.js
 'use client'
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   Box,
   Container,
@@ -54,7 +54,8 @@ import {
   FiChevronUp,
   FiChevronDown,
   FiUserPlus,
-  FiCheckCircle
+  FiCheckCircle,
+  FiClock
 } from 'react-icons/fi';
 import { FaChild, FaStripe, FaCreditCard, FaWallet, FaRegClock, FaCheckCircle } from "react-icons/fa";
 import Link from 'next/link';
@@ -252,6 +253,8 @@ const CheckoutPage = (user) => {
   const [stripe, setStripe] = useState(null);
   const [eligibleForPayLater, setEligibleForPayLater] = useState(false);
   const { isLoggedIn, loading, logout, userData } = useAuth();
+  const [countdowns, setCountdowns] = useState({});
+  const timersRef = useRef({});
   
   const pathname = usePathname();
   const isMobile = useBreakpointValue({ base: true, lg: false });
@@ -276,7 +279,134 @@ const CheckoutPage = (user) => {
   const paymentMethod = watch('paymentMethod');
   const paymentType = watch('paymentType');
 
-  // Fetch cart item by ID
+   const calculateTimeRemaining = (addedAt, expiresAt) => {
+    try {
+      const now = new Date().getTime();
+      const addedTime = new Date(addedAt).getTime();
+      const expireTime = new Date(expiresAt).getTime();
+      
+      // Calculate total reservation time (from added to expired)
+      const totalReservationTime = expireTime - addedTime;
+      const timeRemaining = expireTime - now;
+      
+      // Debug logs
+      //console.log('Added At:', addedAt, 'Parsed:', new Date(addedAt));
+      //console.log('Expires At:', expiresAt, 'Parsed:', new Date(expiresAt));
+      //console.log('Total Reservation Time (ms):', totalReservationTime);
+      //console.log('Time Remaining (ms):', timeRemaining);
+      
+      if (timeRemaining <= 0) {
+        return {
+          total: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          percentage: 100,
+          expired: true
+        };
+      }
+      
+      const totalSeconds = Math.floor(timeRemaining / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      
+      // Calculate percentage based on actual total reservation time
+      let percentage = 0;
+      if (totalReservationTime > 0) {
+        const elapsedTime = totalReservationTime - timeRemaining;
+        percentage = Math.max(0, Math.min(100, (elapsedTime / totalReservationTime) * 100));
+      } else {
+        // Fallback to time-based percentage if total time is invalid
+        percentage = Math.max(0, Math.min(100, (timeRemaining / (15 * 60 * 1000)) * 100));
+      }
+      
+      return {
+        total: timeRemaining,
+        hours,
+        minutes,
+        seconds,
+        percentage: Math.round(percentage),
+        expired: false
+      };
+    } catch (error) {
+      console.error('Error calculating time remaining:', error, 'addedAt:', addedAt, 'expiresAt:', expiresAt);
+      return {
+        total: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        percentage: 0,
+        expired: true
+      };
+    }
+  };
+
+   const startCountdownTimer = useCallback((itemId, addedAt, expiresAt) => {
+    // Clear existing timer if any
+    if (timersRef.current[itemId]) {
+      clearInterval(timersRef.current[itemId]);
+    }
+
+    const timer = setInterval(() => {
+      setCountdowns(prev => {
+        const newTime = calculateTimeRemaining(addedAt, expiresAt);
+
+        console.log(`Countdown for item ${itemId}:`, newTime);
+        
+        // If time is up, clear the interval and remove item
+        if (newTime.total <= 0 || newTime.expired) {
+          clearInterval(timer);
+          delete timersRef.current[itemId];
+          // Automatically remove the item from cart
+          removeExpiredItem(itemId);
+          return { ...prev, [itemId]: newTime };
+        }
+        
+        return { ...prev, [itemId]: newTime };
+      });
+    }, 1000);
+
+    timersRef.current[itemId] = timer;
+    return timer;
+  }, []);
+
+  // Format duration for display (e.g., "15 min" or "2 hours")
+  const formatDuration = (milliseconds) => {
+    const minutes = Math.floor(milliseconds / (1000 * 60));
+    const hours = Math.floor(minutes / 60);
+    
+    if (hours > 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''}`;
+    }
+    return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+  };
+
+  // Initialize countdown timers for all items
+  const initializeCountdowns = useCallback((items) => {
+    const initialCountdowns = {};
+    
+   // Clean up existing timers
+     // Clean up existing timers
+    Object.values(timersRef.current).forEach(timer => {
+      if (timer) clearInterval(timer);
+    });
+    timersRef.current = {};
+
+    if (items.added_at && items.expires_at) {
+      initialCountdowns[items.id] = calculateTimeRemaining(items.added_at, items.expires_at);
+    }
+
+    setCountdowns(initialCountdowns);
+    
+    // Start timers for each item
+    if (items.added_at && items.expires_at && items.id) {
+      startCountdownTimer(items.id, items.added_at, items.expires_at);
+    }
+    
+  }, [startCountdownTimer]);
+
+   // Fetch cart item by ID
   const fetchCartItem = useCallback(async () => {
     if (!id) {
       setCartLoading(false);
@@ -305,17 +435,98 @@ const CheckoutPage = (user) => {
       
       if (result) {
         setCartItem(result);
+        initializeCountdowns(result);
         // Set default values for the form
         setValue('holderEmail', result.holder_email || '');
       } else {
-        console.error('No cart item found');
+        setCartItem(null);
       }
     } catch (error) {
       console.error('Error fetching cart item:', error);
     } finally {
       setCartLoading(false);
     }
-  }, [id, setValue]);
+  }, [id, setValue, initializeCountdowns]);
+
+  const removeFromCart = async (itemId) => {
+    const formData = new FormData();
+    formData.append('cart_id', itemId);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/remove-cart-item`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+        },
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error('Failed to remove cart item');
+      }
+      const result = await response.json();
+      console.log('Remove result:', result);
+      if (result.success) {
+        // Clean up timer
+        if (timersRef.current[itemId]) {
+          clearInterval(timersRef.current[itemId]);
+          delete timersRef.current[itemId];
+        }
+        
+        // Remove from countdowns state
+        setCountdowns(prev => {
+          const newCountdowns = { ...prev };
+          delete newCountdowns[itemId];
+          return newCountdowns;
+        });
+        
+        fetchCartItem(); // Refresh cart after removal
+      } else {
+        fetchCartItem(); // Refresh cart after removal
+      }
+    }
+    catch (error) {
+      console.error('Error removing cart item:', error);
+    }
+  };
+
+
+  // Remove expired item from cart
+  const removeExpiredItem = async (itemId) => {
+    try {
+      await removeFromCart(itemId);
+      console.log(`Item ${itemId} removed due to expiration`);
+    } catch (error) {
+      console.error('Error removing expired item:', error);
+    }
+  };
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(timersRef.current).forEach(timer => {
+        if (timer) clearInterval(timer);
+      });
+    };
+  }, []);
+
+  const getTimeColor = (timeData) => {
+    if (!timeData || timeData.expired || timeData.total <= 0) return "red.500";
+    if (timeData.minutes < 5) return "red.500";
+    if (timeData.minutes < 10) return "orange.500";
+    return "green.500";
+  };
+
+   const formatTimeDisplay = (timeData) => {
+    if (!timeData || timeData.expired || timeData.total <= 0) {
+      return "Expired";
+    }
+    
+    if (timeData.hours > 0) {
+      return `${timeData.hours.toString().padStart(2, '0')}:${timeData.minutes.toString().padStart(2, '0')}:${timeData.seconds.toString().padStart(2, '0')}`;
+    }
+    
+    return `${timeData.minutes.toString().padStart(2, '0')}:${timeData.seconds.toString().padStart(2, '0')}`;
+  };
+
 
   useEffect(() => {
     if (cartItem?.booking_details?.checkIn) {
@@ -335,7 +546,7 @@ const CheckoutPage = (user) => {
 
    const calculateTotal = () => {
     if (!cartItem) return 0;
-    const netPrice = parseFloat(cartItem.rate_data.net) || 0;
+    const netPrice = parseFloat(cartItem.rate_data?.net) || 0;
     if(userData && userData.token !== ''){
       if(userData.hotel_margin === 0) return (netPrice).toFixed(2);
       const calc = calculatePercentage(netPrice, userData.hotel_margin);
@@ -429,7 +640,7 @@ const CheckoutPage = (user) => {
   };
 
   const getHotelTaxes = () => {
-    if (!cartItem || !cartItem.rate_data.taxes || !cartItem.rate_data.taxes.taxes) {
+    if (!cartItem || !cartItem.rate_data?.taxes || !cartItem.rate_data.taxes?.taxes) {
       return [];
     }
     return cartItem.rate_data.taxes.taxes.filter(tax => tax.included === false);
@@ -792,8 +1003,8 @@ const CheckoutPage = (user) => {
     if (!cartItem) return null;
     
     const nights = calculateNights(
-      cartItem.booking_details.checkIn,
-      cartItem.booking_details.checkOut
+      cartItem.booking_details?.checkIn,
+      cartItem.booking_details?.checkOut
     );
     const totalAmount = calculateTotal();
     const hotelTaxes = getHotelTaxes();
@@ -804,10 +1015,10 @@ const CheckoutPage = (user) => {
           <Text fontWeight="bold" mb={2}>{cartItem.room_data?.name}</Text>
           <VStack align="start" spacing={1}>
             <Text fontSize="sm" color="gray.600">
-              {formatDate(cartItem.booking_details.checkIn)} - {formatDate(cartItem.booking_details.checkOut)}
+              {formatDate(cartItem.booking_details?.checkIn)} - {formatDate(cartItem.booking_details?.checkOut)}
             </Text>
             <Text fontSize="sm" color="gray.600">
-              {nights} night{nights > 1 ? 's' : ''} • {cartItem.booking_details.rooms} room{cartItem.booking_details.rooms > 1 ? 's' : ''}
+              {nights} night{nights > 1 ? 's' : ''} • {cartItem.booking_details?.rooms} room{cartItem.booking_details?.rooms > 1 ? 's' : ''}
             </Text>
           </VStack>
         </Box>
@@ -823,7 +1034,7 @@ const CheckoutPage = (user) => {
           <Flex justify="space-between">
             <Text color="gray.600">Subtotal</Text>
             <Text fontWeight="semibold">
-              {cartItem.rate_data?.currency || 'EUR'} {cartItem.rate_data.net || '0.00'}
+              {cartItem.rate_data?.currency || 'EUR'} {cartItem.rate_data?.net || '0.00'}
             </Text>
           </Flex>
 
@@ -912,15 +1123,15 @@ const CheckoutPage = (user) => {
   }
 
   const nights = calculateNights(
-    cartItem.booking_details.checkIn,
-    cartItem.booking_details.checkOut
+    cartItem.booking_details?.checkIn,
+    cartItem.booking_details?.checkOut
   );
   const hotelImage = cartItem.room_data?.images?.[0]?.path
     ? `http://photos.hotelbeds.com/giata/${cartItem.room_data.images[0].path}`
-    : null;
+    : 'hotelplaceholder.png';
   const hotelMainImage = cartItem.hotel_info?.main_image_path
     ? `http://photos.hotelbeds.com/giata/${cartItem.hotel_info.main_image_path}`
-    : null;
+    : 'hotelplaceholder.png';
 
   // Helper function to render guest inputs for a room
   const renderGuestInputs = (room) => {
@@ -1028,6 +1239,64 @@ const CheckoutPage = (user) => {
     return inputs;
   };
 
+  const getTotalReservationDuration = (item) => {
+    if (!item.addedAt || !item.expiresAt) return null;
+    
+    try {
+      const addedTime = new Date(item.added_at).getTime();
+      const expireTime = new Date(item.expires_at).getTime();
+      const totalTime = expireTime - addedTime;
+      
+      if (totalTime > 0) {
+        return formatDuration(totalTime);
+      }
+    } catch (error) {
+      console.error('Error calculating total duration:', error);
+    }
+    return null;
+  };
+
+  const disPlayCountdown = () => {
+    const timeData = countdowns[cartItem.id];
+    const isExpired = timeData && (timeData.expired || timeData.total <= 0);
+    const totalDuration = getTotalReservationDuration(cartItem);
+
+    return (
+      <Box mb={2}>
+        <VStack spacing={2} align="stretch">
+          <Flex justify="space-between" align="center">
+            <VStack align="start" spacing={1}>
+              <HStack spacing={2}>
+                <FiClock color="#4A5568" />
+                <Text fontWeight="semibold" color="gray.700">
+                  Reservation Time Remaining
+                </Text>
+              </HStack>
+              {totalDuration && (
+                <Text fontSize="xs" color="gray.500">
+                  Total hold time: {totalDuration}
+                </Text>
+              )}
+            </VStack>
+            <Text
+              fontSize="lg"
+              fontWeight="bold"
+              color={getTimeColor(timeData)}
+            >
+              {timeData ? formatTimeDisplay(timeData) : "Calculating..."}
+            </Text>
+          </Flex>
+
+          {isExpired && (
+            <Badge colorScheme="red" alignSelf="flex-start">
+              Expired - This item will be removed shortly
+            </Badge>
+          )}
+        </VStack>
+      </Box>
+    );
+  };
+
   return (
 
       <Box minH="100vh" bg="gray.50" pb={{ base: '140px', lg: '0' }}>
@@ -1039,7 +1308,7 @@ const CheckoutPage = (user) => {
             <Box>
               <Flex direction={{ base: 'column', sm: 'row' }} justify="space-between" align={{ base: 'start', sm: 'center' }} mb={2} gap={3}>
                 <HStack spacing={3}>
-                  <Box display={{ base: 'none', sm: 'block' }}>
+                  <Box display={{ base: 'block', sm: 'block' }}>
                     <FiCreditCard size={28} color="#3182CE" />
                   </Box>
                   <Heading size={{ base: 'lg', md: 'xl' }} color="gray.800">Complete Your Booking</Heading>
@@ -1051,6 +1320,7 @@ const CheckoutPage = (user) => {
               <Text color="gray.600" fontSize={{ base: 'md', md: 'lg' }}>
                 Review your booking details and enter guest information
               </Text>
+              {disPlayCountdown()}
             </Box>
 
             <form id="checkout-form" onSubmit={handleSubmit(onSubmit)}>
@@ -1161,11 +1431,11 @@ const CheckoutPage = (user) => {
                             <HStack spacing={2}>
                               <FiCalendar color="gray.500" size={14} />
                               <Text fontSize="sm" color="gray.600">
-                                {formatDate(cartItem.booking_details.checkIn)} → {formatDate(cartItem.booking_details.checkOut)}
+                                {formatDate(cartItem.booking_details?.checkIn)} → {formatDate(cartItem.booking_details?.checkOut)}
                               </Text>
                             </HStack>
                             <Text fontSize="sm" color="gray.600">
-                              {nights} night{nights > 1 ? 's' : ''} • {cartItem.booking_details.rooms} room{cartItem.booking_details.rooms > 1 ? 's' : ''}
+                              {nights} night{nights > 1 ? 's' : ''} • {cartItem.booking_details?.rooms} room{cartItem.booking_details?.rooms > 1 ? 's' : ''}
                             </Text>
                           </VStack>
                         </Box>
@@ -1251,7 +1521,7 @@ const CheckoutPage = (user) => {
                   </Card.Root>
 
                   {/* Section 4: Guest Information for Each Room */}
-                  {cartItem.booking_details.roomDetails.map((room, roomIndex) => (
+                  {cartItem.booking_details?.roomDetails.map((room, roomIndex) => (
                     <Card.Root key={room.roomNumber} variant="outline">
                       <Card.Header py={4}>
                         <HStack spacing={2}>

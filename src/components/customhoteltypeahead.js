@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   Input,
   Box,
@@ -122,7 +122,50 @@ const HotelSearchInput = React.memo(function HotelSearchInput({
     }
   }, [stableInitialQuery, onChange, fetchDestinationMatch]);
 
+    // 🔹 Debounce timer ref
+  const debounceTimer = useRef(null);
+  // 🔹 Abort controller for cancelling previous requests
+  const abortControllerRef = useRef(null);
+
+  // 🔹 Debounced search function
+  const debouncedSearch = useCallback((searchQuery) => {
+    // Clear previous timer
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create new abort controller
+    abortControllerRef.current = new AbortController();
+    
+    // Set new timer
+    debounceTimer.current = setTimeout(() => {
+      if (searchQuery.length >= 2) {
+        fetchSearchResults(searchQuery);
+      } else {
+        setResults([]);
+      }
+    }, 500); // 500ms delay - adjust as needed
+  }, []);
+
+  // 🔹 Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   // 🔹 Search hotels + destinations
+ // 🔹 Search hotels + destinations
   const fetchSearchResults = (searchQuery) => {
     if (searchQuery.length < 2) {
       setResults([]);
@@ -159,21 +202,28 @@ const HotelSearchInput = React.memo(function HotelSearchInput({
       ).then((res) => res.json()),
     ])
       .then(([hotels, destinations]) => {
+        console.log("Search results:", { hotels, destinations });
         if (signal.aborted) return;
 
-        const hotelResults = (hotels?.result || []).map((hotel) => ({
-          type: "hotel",
-          dest_code: hotel.dest_code,
-          label: `${hotel.name}, ${hotel.dest}, ${hotel.country}`,
-          details: hotel,
-        }));
 
-        const destinationResults = (destinations?.result || []).map((dest) => ({
-          type: "destination",
-          dest_code: dest.dest_code,
-          label: `${dest.dest} (${dest.dest_code}), ${dest.country} - ${dest.total} Hotels`,
-          details: dest,
-        }));
+        // ✅ FIXED: Safely handle the results
+        const hotelResults = Array.isArray(hotels?.result) 
+          ? hotels.result.map((hotel) => ({
+              type: "hotel",
+              dest_code: hotel.dest_code,
+              label: `${hotel.name}, ${hotel.dest}, ${hotel.country}`,
+              details: hotel,
+            }))
+          : [];
+
+        const destinationResults = Array.isArray(destinations?.result)
+          ? destinations.result.map((dest) => ({
+              type: "destination",
+              dest_code: dest.dest_code,
+              label: `${dest.dest} (${dest.dest_code}), ${dest.country} - ${dest.total} Hotels`,
+              details: dest,
+            }))
+          : [];
 
         setResults([...hotelResults, ...destinationResults]);
         setLoading(false);
@@ -181,6 +231,7 @@ const HotelSearchInput = React.memo(function HotelSearchInput({
       .catch((err) => {
         if (err.name !== "AbortError") {
           console.error("Search request failed", err);
+          setResults([]);
           setLoading(false);
         }
       });

@@ -212,7 +212,7 @@ export default function BookingConfirmation() {
             <Alert.Indicator />
             <VStack align="start" spacing={1}>
               <Text fontWeight="bold">Booking Not Found</Text>
-              <Text fontSize="sm">The booking you're looking for doesn't exist or has expired.</Text>
+              <Text fontSize="sm">The booking you{`'`}re looking for doesn{`'`}t exist or has expired.</Text>
             </VStack>
           </Alert.Root>
           <Button mt={4} colorScheme="blue" onClick={() => router.push('/')}>

@@ -587,7 +587,7 @@ const RoomDetailsModals = ({ isOpen, onClose, room, user}) => {
     );
   };
 
-  console.log("user", user.user);
+  //console.log("user", user.user);
 
   const AddToCartConfirmationModal = () => {
     const roomDataFromURL = parseRoomDataFromURL();

@@ -4,7 +4,6 @@ import { cookies } from 'next/headers';
 
 export async function generateMetadata({ searchParams }) {
  const { id } = await searchParams;
- console.log("Generating metadata for cartId:", searchParams.id);
   const baseMetadata = {
     title: "Complete Your Booking | Secure Checkout | Smallyfares",
     description: "Securely complete your hotel booking on Smallyfares. Review your booking details, enter guest information, and choose payment method for a seamless checkout experience.",

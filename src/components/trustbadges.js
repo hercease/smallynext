@@ -16,7 +16,7 @@ export default function TrustBadges() {
         <VStack spacing={8} mb={12} textAlign="center">
           <Heading size="lg">Why Travelers Trust Us</Heading>
           <Text color="gray.600" maxW="2xl">
-            We're committed to providing you with the best travel experience
+            We{`'`}re committed to providing you with the best travel experience
           </Text>
         </VStack>
         

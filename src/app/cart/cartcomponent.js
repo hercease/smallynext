@@ -18,7 +18,8 @@ import {
   Spinner,
   Divider,
   SimpleGrid,
-  Progress
+  Progress,
+  Dialog, Portal, CloseButton
 } from '@chakra-ui/react';
 import { FiTrash2, FiShoppingCart, FiCreditCard, FiArrowLeft, FiCalendar, FiUsers, FiHome, FiDollarSign, FiClock } from 'react-icons/fi';
 import Link from 'next/link';
@@ -32,6 +33,8 @@ const CartPage = (user) => {
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
   const timersRef = useRef({});
+  const [OpenDialog, setOpenDialog] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
   // Get session ID for guest users
   const getSessionId = useCallback(async () => {
@@ -115,44 +118,7 @@ const CartPage = (user) => {
     }
   };
 
-  // Format duration for display (e.g., "15 min" or "2 hours")
-  const formatDuration = (milliseconds) => {
-    const minutes = Math.floor(milliseconds / (1000 * 60));
-    const hours = Math.floor(minutes / 60);
-    
-    if (hours > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''}`;
-    }
-    return `${minutes} minute${minutes > 1 ? 's' : ''}`;
-  };
-
-  // Initialize countdown timers for all items
-  const initializeCountdowns = useCallback((items) => {
-    const initialCountdowns = {};
-    
-    // Clean up existing timers
-    Object.values(timersRef.current).forEach(timer => {
-      if (timer) clearInterval(timer);
-    });
-    timersRef.current = {};
-    
-    items.forEach(item => {
-      if (item.addedAt && item.expiresAt) {
-        initialCountdowns[item.id] = calculateTimeRemaining(item.addedAt, item.expiresAt);
-      }
-    });
-    setCountdowns(initialCountdowns);
-    
-    // Start timers for each item
-    items.forEach(item => {
-      if (item.addedAt && item.expiresAt && item.id) {
-        startCountdownTimer(item.id, item.addedAt, item.expiresAt);
-      }
-    });
-  }, []);
-
-  // Start countdown timer for a specific item
-  const startCountdownTimer = (itemId, addedAt, expiresAt) => {
+   const startCountdownTimer = useCallback((itemId, addedAt, expiresAt) => {
     // Clear existing timer if any
     if (timersRef.current[itemId]) {
       clearInterval(timersRef.current[itemId]);
@@ -177,7 +143,45 @@ const CartPage = (user) => {
 
     timersRef.current[itemId] = timer;
     return timer;
+  }, []);
+
+  // Format duration for display (e.g., "15 min" or "2 hours")
+  const formatDuration = (milliseconds) => {
+    const minutes = Math.floor(milliseconds / (1000 * 60));
+    const hours = Math.floor(minutes / 60);
+    
+    if (hours > 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''}`;
+    }
+    return `${minutes} minute${minutes > 1 ? 's' : ''}`;
   };
+
+  // Initialize countdown timers for all items
+  const initializeCountdowns = useCallback((items) => {
+    const initialCountdowns = {};
+
+    // Clean up existing timers
+    Object.values(timersRef.current).forEach(timer => {
+      if (timer) clearInterval(timer);
+    });
+    timersRef.current = {};
+    
+    items.forEach(item => {
+      if (item.addedAt && item.expiresAt) {
+        initialCountdowns[item.id] = calculateTimeRemaining(item.addedAt, item.expiresAt);
+      }
+    });
+    
+    setCountdowns(initialCountdowns);
+    
+    // Start timers for each item
+    items.forEach(item => {
+      if (item.addedAt && item.expiresAt && item.id) {
+        startCountdownTimer(item.id, item.addedAt, item.expiresAt);
+      }
+    });
+  }, [startCountdownTimer]);
+
 
   // Remove expired item from cart
   const removeExpiredItem = async (itemId) => {
@@ -278,7 +282,7 @@ const CartPage = (user) => {
     const formData = new FormData();
     formData.append('cart_id', itemId);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/fetch-cart-by-id`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/remove-cart-item`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
@@ -393,6 +397,19 @@ const CartPage = (user) => {
       console.error('Error calculating total duration:', error);
     }
     return null;
+  };
+
+  const handleDeleteConfirmation = (itemId) => {
+    setSelectedItemId(itemId);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedItemId) {
+      await handleRemoveItem(selectedItemId);
+      setOpenDialog(false);
+      setSelectedItemId(null);
+    }
   };
 
   if (loading) {
@@ -664,7 +681,7 @@ const CartPage = (user) => {
                         <IconButton
                           colorScheme="red"
                           variant="outline"
-                          onClick={() => handleRemoveItem(item.id)}
+                          onClick={() => handleDeleteConfirmation(item.id)}
                           aria-label="Remove from cart"
                         >
                           <FiTrash2 />
@@ -677,6 +694,31 @@ const CartPage = (user) => {
               );
             })}
           </SimpleGrid>
+
+           <Dialog.Root lazyMount open={OpenDialog} placement="center" closeOnInteractOutside={false} onOpenChange={(e) => setOpenDialog(e.open)}>
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Dialog.Title>Delete Confirmation</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  Are you sure you want to delete this item from your cart?
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Dialog.ActionTrigger asChild>
+                    <Button variant="outline">No</Button>
+                  </Dialog.ActionTrigger>
+                  <Button onClick={() => handleConfirmDelete()}>Yes</Button>
+                </Dialog.Footer>
+                <Dialog.CloseTrigger asChild>
+                  <CloseButton size="sm" />
+                </Dialog.CloseTrigger>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
 
           {/* Continue Shopping Button */}
           <Box textAlign="center" pt={4}>

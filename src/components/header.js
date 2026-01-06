@@ -34,19 +34,16 @@ import {
 } from "react-icons/fi";
 import Link from 'next/link';
 import { useState, useEffect } from 'react'
-import { useColorMode, useColorModeValue } from "@/components/ui/color-mode"
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/Auth.js';
 
 export default function Header() {
   
   const [isOpen, setIsOpen] = useState(false)
-  const { toggleColorMode } = useColorMode()
-  const colorMode = useColorModeValue('light', 'dark')
-  const hoverBgColor = useColorModeValue('gray.100', 'gray.700')
-  const drawerBg = useColorModeValue('white', 'gray.800')
-  const drawerColor = useColorModeValue('gray.800', 'white')
-  const dividerColor = useColorModeValue('gray.200', 'gray.600')
+  const hoverBgColor = 'gray.100'
+  const drawerBg = 'white'
+  const drawerColor = 'gray.800'
+  const dividerColor = 'gray.200'
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -85,11 +82,11 @@ export default function Header() {
       position="sticky"
       top="0"
       zIndex="sticky"
-      bg={useColorModeValue('white', 'gray.800')}
+      bg='white'
       boxShadow="sm"
       borderBottom="1px"
-      color={useColorModeValue('gray.800', 'white')}
-      borderColor={useColorModeValue('gray.200', 'gray.700')}
+      color='gray.800'
+      borderColor='gray.700'
     >
       <Box maxWidth="8xl" mx="auto" px={{ base: '4', md: '8', lg: '12' }}>
         <Flex as="nav" h="60px" align="center" justify="space-between">
@@ -106,7 +103,7 @@ export default function Header() {
 
               <Link href="/">
                 <Image
-                  src={colorMode === 'light' ? lightLogo : darkLogo}
+                  src={lightLogo}
                   alt="logo"
                   height="40px"
                 />
@@ -187,13 +184,13 @@ export default function Header() {
           <Portal>
             <Drawer.Backdrop />
             <Drawer.Positioner>
-              <Drawer.Content bg={drawerBg} color={drawerColor}>
+              <Drawer.Content bg='white' color='gray.800'>
                 {/* Drawer Header with Logo and Close Button */}
-                <Drawer.Header borderBottom="1px" borderColor={dividerColor}>
+                <Drawer.Header borderBottom="1px" borderColor='gray.200'>
                   <Flex justify="space-between" align="center">
                     <Link href="/" onClick={closeDrawer}>
                       <Image
-                        src={colorMode === 'light' ? lightLogo : darkLogo}
+                        src={lightLogo}
                         alt="logo"
                         height="40px"
                       />
@@ -291,9 +288,6 @@ export default function Header() {
                 {/* Drawer Footer with Additional Actions */}
                 <Drawer.Footer borderTop="1px" borderColor={dividerColor}>
                   <VStack spacing={3} align="stretch" width="100%">
-                    <Button variant="outline" onClick={toggleColorMode} width="100%">
-                      {colorMode === 'light' ? 'Dark' : 'Light'} Mode
-                    </Button>
                     
                     {isLoggedIn ? (
                       <Button 

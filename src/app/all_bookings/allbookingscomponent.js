@@ -174,22 +174,22 @@ export default function MyBookingsPage(token) {
       }
       
       const data = await response.json();
-      //console.log("Bookings data:", data);
+      console.log("Bookings data:", data);
       
       // Use sample data if API returns empty or for testing
-      const bookingsData = data.length > 0 ? data : sampleBookings;
+      const bookingsData = data.length > 0 ? data : [];
       setBookings(bookingsData);
       setFilteredBookings(bookingsData);
     } catch (error) {
       console.error("Error fetching bookings:", error);
       setError(error.message);
       // Fallback to sample data for demo
-      setBookings(sampleBookings);
-      setFilteredBookings(sampleBookings);
+      //setBookings(sampleBookings);
+      //setFilteredBookings(sampleBookings);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token.user]);
 
   // Apply filters and sorting
   useEffect(() => {
@@ -896,7 +896,7 @@ export default function MyBookingsPage(token) {
                     <Box>
                       <Text fontWeight="bold">Cancellation Policy:</Text>
                       <Text fontSize="sm">
-                        Cancellation fees may apply based on the provider's policy.
+                        Cancellation fees may apply based on the provider{`'`}s policy.
                       </Text>
                       <Text fontSize="sm" mt={1}>
                         Total amount: {formatCurrency(selectedBooking.total_amount, selectedBooking.currency)}

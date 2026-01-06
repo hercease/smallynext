@@ -288,6 +288,7 @@ const ImageGallery = () => {
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   
   const images = allHotels?.data?.[0]?.local_data?.images || [];
+  console.log("All images", images);
   const imageUrl = "http://photos.hotelbeds.com/giata/";
 
   const nextImage = () => {
@@ -317,22 +318,21 @@ const ImageGallery = () => {
 
   return (
     <Box>
-      {/* Compact Main Image with Slider */}
-      <Box position="relative" width="100%" mb={3} borderRadius="lg" overflow="hidden">
-        <AspectRatio ratio={21 / 9}>
+        <Box position="relative" width="100%" mb={3} borderRadius="lg" overflow="hidden">
+          <AspectRatio ratio={21 / 9}>
           <Image
-            src={`${imageUrl}${`bigger/`}${images[selectedImage].path}`}
-            alt={images[selectedImage].description || `Hotel image ${selectedImage + 1}`}
-            objectFit="contain"
-            borderRadius="lg"
-            cursor="pointer"
-            onClick={() => openViewer(selectedImage)}
-            transition="all 0.3s"
-            _hover={{ transform: 'scale(1.02)' }}
-          />
-        </AspectRatio>
-        
-        {/* Image Description */}
+          src={images[selectedImage]?.path ? `${imageUrl}${`bigger/`}${images[selectedImage].path}` : 'hotelplaceholder.png'}
+          alt={images[selectedImage].description || `Hotel image ${selectedImage + 1}`}
+          objectFit="contain"
+          borderRadius="lg"
+          cursor="pointer"
+          onClick={() => openViewer(selectedImage)}
+          transition="all 0.3s"
+          _hover={{ transform: 'scale(1.02)' }}
+            />
+          </AspectRatio>
+          
+          {/* Image Description */}
         {images[selectedImage].description && (
           <Box
             position="absolute"
@@ -681,7 +681,7 @@ const ImageGallery = () => {
     >
       <AspectRatio ratio={4 / 3}>
         <Image
-          src={room?.images && `${imageUrl}${room?.images[0]?.path}` || 'hotelplaceholder.png'}
+          src={room?.images?.[0] && `${imageUrl}${room?.images[0]?.path}` || 'hotelplaceholder.png'}
           alt={room.name}
           objectFit='cover'
           width="100%"
@@ -981,7 +981,7 @@ const ImageGallery = () => {
 
 
 
-  console.log("allHotels:", allHotels?.data && allHotels?.data[0]);
+  //console.log("allHotels:", allHotels?.data && allHotels?.data[0]);
 
   const displayRooms = roomsWithImages.length > 0 ? roomsWithImages : (allHotels?.data?.[0]?.rooms || []);
 
@@ -993,10 +993,10 @@ const ImageGallery = () => {
 
   return (
     <Box minH="100vh" bg="gray.50">
-    <LoadingSpinner show={isLoading} text="Loading hotel details..." />
+   
     <Header />
     <Container maxW="container.xl" py={8}>
-      
+      <LoadingSpinner show={isLoading} text="Processing your request..." />
       {/* Error Display - Just before breadcrumb */}
       {allHotels?.data?.length === 0 || allHotels?.success === false ? (
         <Box textAlign="center" py="10">
@@ -1041,7 +1041,6 @@ const ImageGallery = () => {
           )}
         </Box>
       ) : (
-        /* Main Content when hotels are found */
         <>
           {/* Breadcrumb */}
           <Breadcrumb.Root mb={6}>
@@ -1083,12 +1082,13 @@ const ImageGallery = () => {
               </Flex>
             </Box>
 
-            {/* Action Buttons */}
+            {/* Action Buttons 
             <VStack spacing={3} align="stretch">
               <Button leftIcon={<FiShare2 />} variant="outline" size="lg">
                 Share
               </Button>
             </VStack>
+            */}
           </Grid>
 
           {/* Image Gallery */}
