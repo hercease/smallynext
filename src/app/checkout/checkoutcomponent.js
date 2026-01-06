@@ -1299,10 +1299,10 @@ const CheckoutPage = (user) => {
   };
 
   return (
-    <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
       <Box minH="100vh" bg="gray.50" pb={{ base: '140px', lg: '0' }}>
         <Header />
         <Container maxW="container.xl" py={8} px={{ base: 4, md: 6 }}>
+        <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
           <VStack spacing={6} align="stretch">
             
             {/* Page Header - Mobile Optimized */}
@@ -1782,6 +1782,7 @@ const CheckoutPage = (user) => {
               </Grid>
             </form>
           </VStack>
+          </Suspense>
         </Container>
 
         {/* Mobile Components */}
@@ -1789,7 +1790,6 @@ const CheckoutPage = (user) => {
         <PriceSummaryDrawer />
         <PaymentDrawer />
       </Box>
-    </Suspense>
   );
 };
 

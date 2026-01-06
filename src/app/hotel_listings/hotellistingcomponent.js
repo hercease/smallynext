@@ -839,11 +839,10 @@ export default function HotelListingPage() {
     );
 
   return (
-    
-    <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
     <Box minH="100vh" bg="gray.50">
       <Header />
       <Container maxW="container.xl" py="6">
+        <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
         <LoadingSpinner show={isLoading} text="Processing your request..." />
         {/* Search and Sort Bar */}
         {!isMobile && (
@@ -945,6 +944,7 @@ export default function HotelListingPage() {
             mt={4}
           />
         )}
+         </Suspense>
       </Container>
                       
       {/* Mobile Filter Modal */}
@@ -991,6 +991,6 @@ export default function HotelListingPage() {
 
       <Footer />
     </Box>
-    </Suspense>
+   
   );
 }
