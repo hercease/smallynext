@@ -239,9 +239,7 @@ export default function BookingConfirmation() {
 
 
   return (
-    <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
-    <Box minH="100vh" bg="gray.50" pb={{ base: '140px', lg: '0' }}>
-    <Header />
+    <>
       <Container maxW="container.xl" py={8} px={{ base: 4, md: 6 }}>
         {/* Header Section */}
         <VStack spacing={6} align="stretch" mb={8}>
@@ -634,7 +632,6 @@ export default function BookingConfirmation() {
           }
         }
       `}</style>
-    </Box>
-    </Suspense>
+    </>
   );
 }

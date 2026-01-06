@@ -1299,12 +1299,9 @@ const CheckoutPage = (user) => {
   };
 
   return (
-      <Box minH="100vh" bg="gray.50" pb={{ base: '140px', lg: '0' }}>
-        <Header />
+      <>
         <Container maxW="container.xl" py={8} px={{ base: 4, md: 6 }}>
-        <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
           <VStack spacing={6} align="stretch">
-            
             {/* Page Header - Mobile Optimized */}
             <Box>
               <Flex direction={{ base: 'column', sm: 'row' }} justify="space-between" align={{ base: 'start', sm: 'center' }} mb={2} gap={3}>
@@ -1782,14 +1779,13 @@ const CheckoutPage = (user) => {
               </Grid>
             </form>
           </VStack>
-          </Suspense>
         </Container>
 
         {/* Mobile Components */}
         <MobileStickyBar />
         <PriceSummaryDrawer />
         <PaymentDrawer />
-      </Box>
+      </>
   );
 };
 

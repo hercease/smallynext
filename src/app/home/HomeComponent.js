@@ -5,15 +5,14 @@ import Footer from "@/components/footer";
 import BookingSection from "@/components/bookingsection";
 import HeroSection from "@/components/herosection";
 import TrustBadges from '@/components/trustbadges';
+import { Box, Container, Skeleton } from '@chakra-ui/react'
 
 export default function HomeComponent() {
     return (
-        <div>
-            <Header />
+        <Box>
             <BookingSection />
             <HeroSection />
             <TrustBadges />
-            <Footer />
-        </div>
+        </Box>
     )
 }

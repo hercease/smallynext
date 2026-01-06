@@ -168,7 +168,6 @@ export default function BookingSection() {
             bgImage="url('/05.jpg')"
             bgSize="cover"
             bgPos="center"
-            rounded="xl"
             py={{ base: 6, lg: 10 }}
             px={4}
         >

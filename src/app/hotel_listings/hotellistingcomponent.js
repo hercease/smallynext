@@ -839,11 +839,9 @@ export default function HotelListingPage() {
     );
 
   return (
-    <Box minH="100vh" bg="gray.50">
-      <Header />
-      <Container maxW="container.xl" py="6">
-        <Suspense fallback={<LoadingSpinner show={true} text="Loading..." />}>
-        <LoadingSpinner show={isLoading} text="Processing your request..." />
+    <>
+    <Container maxW="container.xl" py="6">
+    <LoadingSpinner isLoading={isLoading} text="Fetching Hotels, please wait..." />
         {/* Search and Sort Bar */}
         {!isMobile && (
           <Box borderWidth="1px" borderColor="gray.200" p="4" shadow="md" borderRadius="md" mb="5">
@@ -944,8 +942,6 @@ export default function HotelListingPage() {
             mt={4}
           />
         )}
-         </Suspense>
-      </Container>
                       
       {/* Mobile Filter Modal */}
       <Drawer.Root open={isOpen} onOpenChange={(e) => setIsOpen(e.open)}>
@@ -988,9 +984,8 @@ export default function HotelListingPage() {
           </Portal>
         </div>
       </Drawer.Root>
-
-      <Footer />
-    </Box>
+    </Container>
+     </>
    
   );
 }

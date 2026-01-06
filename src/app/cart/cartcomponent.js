@@ -452,8 +452,7 @@ const CartPage = (user) => {
   }
 
   return (
-    <Box bg="gray.50">
-      <Header />
+    <>
       <Container maxW="container.xl" py={8}>
         <VStack spacing={8} align="stretch">
           {/* Page Header */}
@@ -732,7 +731,7 @@ const CartPage = (user) => {
           </Box>
         </VStack>
       </Container>
-    </Box>
+      </>
   );
 };
 

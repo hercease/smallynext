@@ -2,6 +2,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Provider } from "@/components/ui/provider"
 import { Toaster } from "@/components/ui/toaster"
+import { Suspense } from "react";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import { Box, Container, Skeleton } from '@chakra-ui/react'
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -22,7 +26,36 @@ export default function RootLayout({ children }) {
     <html suppressHydrationWarning lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Provider>
+          <Box minH="100vh" bg="gray.50">
+              <Header />
+               <Suspense fallback={
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '100vh',
+              backgroundColor: '#f7fafc'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '4px solid #e2e8f0',
+                borderTop: '4px solid #3182ce',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}></div>
+              <style>{`
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `}</style>
+            </div>
+          }> 
           {children}
+          </Suspense>
+          <Footer />
+          </Box>
           <Toaster />
         </Provider>
       </body>

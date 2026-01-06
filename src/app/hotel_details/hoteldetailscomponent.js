@@ -992,10 +992,8 @@ const ImageGallery = () => {
   ))}*/
 
   return (
-    <Box minH="100vh" bg="gray.50">
-    <Header />
-    <Container maxW="container.xl" py={8}>
-     <Suspense fallback={<LoadingSpinner show={true} text="Loading hotel details..." />}>  
+    <>
+    <Container maxW="container.xl" py="6">
       <LoadingSpinner show={isLoading} text="Processing your request..." />
       {/* Error Display - Just before breadcrumb */}
       {allHotels?.data?.length === 0 || allHotels?.success === false ? (
@@ -1172,9 +1170,7 @@ const ImageGallery = () => {
           </Grid>
         </>
       )}
-    </Suspense>
-    </Container>
-
+ 
     {/* Modals */}
     {/*<RoomDetailsModal />*/}
     <BookingModal />
@@ -1184,8 +1180,8 @@ const ImageGallery = () => {
       room={selectedRoom}
       user={user}
     />
-    <Footer />
-  </Box>
+    </Container>
+    </>
   
   );
 };
