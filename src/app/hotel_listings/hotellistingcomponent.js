@@ -74,7 +74,8 @@ export default function HotelListingPage() {
     const [rooms, setRooms] = React.useState([{...initialRoomState}]);
     const [isAccordionOpen, setIsAccordionOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSpinner, setIsSpinner] = useState(true);
     const imageUrl = "http://photos.hotelbeds.com/giata/";
     const datevalue = {
       start: params.get('checkIn') || null,
@@ -841,7 +842,7 @@ export default function HotelListingPage() {
   return (
     <>
     <Container maxW="container.xl" py="6">
-    <LoadingSpinner isLoading={isLoading} text="Fetching Hotels, please wait..." />
+    <LoadingSpinner show={isSpinner} text="Fetching Hotels, please wait..." />
         {/* Search and Sort Bar */}
         {!isMobile && (
           <Box borderWidth="1px" borderColor="gray.200" p="4" shadow="md" borderRadius="md" mb="5">
