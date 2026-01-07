@@ -28,7 +28,7 @@ export const metadata = {
         siteName: "Smallyfares",
         images: [
             {
-                url: "https://smallyfares.com/logo.png",
+                url: "https://smallyfares.com/logo/logo.png",
                 width: 1200,
                 height: 630,
                 alt: "Smallyfares - Cheap Airline Tickets & Travel Deals",
@@ -42,7 +42,7 @@ export const metadata = {
         title: "Smallyfares | Cheap Airline Tickets, Air Travels, Book Hotels, Book Cars & Holiday Packages",
         description: "Book cheap airline tickets, hotels, car rentals, and holiday packages with Smallyfares. Enjoy seamless travel experiences and exclusive deals worldwide.",
         images: {
-            url: "https://smallyfares.com/smallyfares_png.png",
+            url: "https://smallyfares.com/logo/logo.png",
             alt: "Smallyfares - Cheap Airline Tickets & Travel Deals",
         },
         creator: "@Smallyfares",

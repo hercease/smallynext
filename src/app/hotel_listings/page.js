@@ -29,7 +29,7 @@ export const metadata = {
         siteName: "Smallyfares Hotels",
         images: [
             {
-                url: "https://smallyfares.com/og-hotel-image.jpg",
+                url: "https://smallyfares.com/logo/logo.png",
                 width: 1200,
                 height: 630,
                 alt: "Smallyfares Hotel Deals - Find Your Perfect Stay",

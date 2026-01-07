@@ -29,7 +29,7 @@ export const metadata = {
         siteName: "Smallyfares Hotels",
         images: [
             {
-                url: "https://smallyfares.com/og-hotel-image.jpg",
+                url: "https://smallyfares.com/logo/logo.png",
                 width: 1200,
                 height: 630,
                 alt: "Smallyfares Hotel Deals - Find Your Perfect Stay",
@@ -43,7 +43,7 @@ export const metadata = {
         title: "Hotel Deals & Accommodations | Smallyfares",
         description: "Discover the best hotel deals with Smallyfares. Book luxury resorts, budget stays, and unique accommodations worldwide.",
         images: {
-            url: "https://smallyfares.com/twitter-hotel-image.jpg",
+            url: "https://smallyfares.com/logo/logo.png",
             alt: "Smallyfares Hotel Deals - Find Your Perfect Stay",
         },
         creator: "@Smallyfares",
@@ -81,7 +81,7 @@ export const jsonLd = {
         name: 'Smallyfares',
         logo: {
             '@type': 'ImageObject',
-            url: 'https://smallyfares.com/logo.png'
+            url: 'https://smallyfares.com/logo/logo.png'
         }
     },
     mainEntity: {

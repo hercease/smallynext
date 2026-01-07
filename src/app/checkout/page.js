@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }) {
       url: `https://smallyfares.com/checkout${id ? `?id=${id}` : ''}`,
       images: [
         {
-          url: "https://smallyfares.com/checkout-og-image.png",
+          url: "https://smallyfares.com/logo/logo.png",
           width: 1200,
           height: 630,
           alt: "Smallyfares - Secure Checkout Process",
