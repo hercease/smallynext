@@ -315,6 +315,7 @@ const CartPage = (user) => {
 
   // Start countdown timer for an item
   const startCountdownTimer = useCallback((itemId, addedAt, expiresAt) => {
+    console.log('Starting timer for item:', itemId, addedAt, expiresAt);
     // Clear existing timer if any
     if (timersRef.current[itemId]) {
       clearInterval(timersRef.current[itemId]);
