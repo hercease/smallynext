@@ -157,7 +157,7 @@ const CartPage = (user) => {
         expired: false
       };
     } catch (error) {
-      console.error('Error calculating time remaining:', error, 'addedAt:', addedAt, 'expiresAt:', expiresAt);
+      //console.error('Error calculating time remaining:', error, 'addedAt:', addedAt, 'expiresAt:', expiresAt);
       return {
         total: 0,
         hours: 0,
@@ -220,7 +220,7 @@ const CartPage = (user) => {
 
       const result = await response.json();
 
-      console.log('Fetch cart result:', result);
+      //console.log('Fetch cart result:', result);
       
       if (result.success) {
         const cartItems = result.cart_items.map(item => ({
@@ -277,7 +277,7 @@ const CartPage = (user) => {
         throw new Error('Failed to remove cart item');
       }
       const result = await response.json();
-      console.log('Remove result:', result);
+      //console.log('Remove result:', result);
       if (result.success) {
         // Clean up timer
         if (timersRef.current[itemId]) {
@@ -307,7 +307,7 @@ const CartPage = (user) => {
   const removeExpiredItem = useCallback(async (itemId) => {
     try {
       await removeFromCart(itemId);
-      console.log(`Item ${itemId} removed due to expiration`);
+      //console.log(`Item ${itemId} removed due to expiration`);
     } catch (error) {
       console.error('Error removing expired item:', error);
     }
@@ -315,7 +315,7 @@ const CartPage = (user) => {
 
   // Start countdown timer for an item
   const startCountdownTimer = useCallback((itemId, addedAt, expiresAt) => {
-    console.log('Starting timer for item:', itemId, addedAt, expiresAt);
+    //console.log('Starting timer for item:', itemId, addedAt, expiresAt);
     // Clear existing timer if any
     if (timersRef.current[itemId]) {
       clearInterval(timersRef.current[itemId]);
@@ -324,7 +324,7 @@ const CartPage = (user) => {
     const timer = setInterval(() => {
       setCountdowns(prev => {
         const newTime = calculateTimeRemaining(addedAt, expiresAt);
-        console.log('New time:', newTime);
+        //console.log('New time:', newTime);
         // If time is up, clear the interval and remove item
         if (newTime.total <= 0 || newTime.expired) {
           clearInterval(timer);

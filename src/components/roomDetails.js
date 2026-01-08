@@ -87,7 +87,7 @@ const RoomDetailsModals = ({ isOpen, onClose, room, user}) => {
         });
 
         const data = await response.json();
-        console.log("rate Comments", data);
+        //console.log("rate Comments", data);
         
       } catch (error) {
         console.error('Error fetching rate comments:', error);
