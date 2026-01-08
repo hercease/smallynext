@@ -330,7 +330,7 @@ const CartPage = (user) => {
           clearInterval(timer);
           delete timersRef.current[itemId];
           // Automatically remove the item from cart
-          removeExpiredItem(itemId);
+          //removeExpiredItem(itemId);
           return { ...prev, [itemId]: newTime };
         }
         
@@ -340,7 +340,7 @@ const CartPage = (user) => {
 
     timersRef.current[itemId] = timer;
     return timer;
-  }, [removeExpiredItem]);
+  }, []);
 
   // Initialize countdown timers for all items
   const initializeCountdowns = useCallback(() => {
