@@ -742,6 +742,7 @@ const CheckoutPage = (user) => {
     }
     params.append('user', isLoggedIn && userData.email || '');
     params.append('platform', 'smallyfares');
+    params.append('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
      
     /* ----------------------------------------------------
     * API Call

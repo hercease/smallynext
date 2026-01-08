@@ -216,6 +216,7 @@ const RoomDetailsModals = ({ isOpen, onClose, room, user}) => {
     formData.append('bookingDetails', JSON.stringify(cartData.bookingDetails));
     formData.append('session_id', getSessionId());
     formData.append('user_id', user.user);
+    formData.append('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
   
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/add-room-to-cart`, {
       method: 'POST',
