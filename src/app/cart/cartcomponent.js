@@ -323,13 +323,13 @@ const CartPage = (user) => {
     const timer = setInterval(() => {
       setCountdowns(prev => {
         const newTime = calculateTimeRemaining(addedAt, expiresAt);
-        
+        console.log('New time:', newTime);
         // If time is up, clear the interval and remove item
         if (newTime.total <= 0 || newTime.expired) {
           clearInterval(timer);
           delete timersRef.current[itemId];
           // Automatically remove the item from cart
-          removeExpiredItem(itemId);
+          //removeExpiredItem(itemId);
           return { ...prev, [itemId]: newTime };
         }
         
@@ -339,7 +339,7 @@ const CartPage = (user) => {
 
     timersRef.current[itemId] = timer;
     return timer;
-  }, [removeExpiredItem]);
+  }, []);
 
   // Initialize countdown timers for all items
   const initializeCountdowns = useCallback(() => {
