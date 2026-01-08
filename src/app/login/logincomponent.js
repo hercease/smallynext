@@ -157,7 +157,7 @@ export default function MinimalSignInPage() {
         <Flex justify="center" mb={8}>
           <Image
             src="/logo/logo.png"
-            alt="SkyJet Airlines"
+            alt="Smallyfares Logo"
             height="48px"
           />
         </Flex>

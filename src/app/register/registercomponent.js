@@ -388,7 +388,7 @@ export default function SignUpPage() {
           </Button>
           <Image
             src="/logo/logo.png"
-            alt="Airline Logo"
+            alt="Smallyfares Logo"
             height="40px"
           />
         </HStack>

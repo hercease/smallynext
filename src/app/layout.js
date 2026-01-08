@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { Box, Container, Skeleton } from '@chakra-ui/react'
+import { ConditionalHeader, ConditionalFooter } from "@/components/conditional-layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,8 +43,9 @@ export default function RootLayout({ children }) {
               </div>
             }>
               {/* HEADER MUST BE INSIDE SUSPENSE */}
-              <Header />
+              <ConditionalHeader />
               {children}
+              <ConditionalFooter />
             </Suspense>
             <Footer />
           </Box>
