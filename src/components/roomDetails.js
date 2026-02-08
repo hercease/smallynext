@@ -87,7 +87,7 @@ const RoomDetailsModals = ({ isOpen, onClose, room, user}) => {
         });
 
         const data = await response.json();
-        //console.log("rate Comments", data);
+        console.log("rate Comments", data);
         
       } catch (error) {
         console.error('Error fetching rate comments:', error);
@@ -96,9 +96,9 @@ const RoomDetailsModals = ({ isOpen, onClose, room, user}) => {
       }
     }, [room]);
 
-    /*useEffect(() => {
+    useEffect(() => {
       fetchRateComments();
-    }, [room, fetchRateComments]);*/
+    }, [room, fetchRateComments]);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
   const roomData = room;
